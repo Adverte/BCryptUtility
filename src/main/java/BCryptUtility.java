@@ -9,8 +9,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.Collections;
 import java.util.function.BiConsumer;
+import java.util.stream.Stream;
 
 public class BCryptUtility {
+
     private final static String RESULT_FILE = "result.csv";
     private final static String SOURCE_FILE = "source.csv";
     public static final String COMMA_DELIMITER = ";";
@@ -21,13 +23,14 @@ public class BCryptUtility {
 //        System.out.println("Encryted Password: " + encrytedPassword);
 
         Path path = Paths.get(SOURCE_FILE);
-        Files.lines(path)
-            .map(e -> {
+        try (Stream<String> lines = Files.lines(path)) {
+            lines.map(e -> {
                 String[] values = e.split(COMMA_DELIMITER);
                 values[1] = encrytePassword(values[1]);
                 return String.join(COMMA_DELIMITER, values);
             })
-            .forEach(e -> writeToFile.accept(RESULT_FILE, e));
+                .forEach(e -> writeToFile.accept(RESULT_FILE, e));
+        }
         System.out.println("Completed");
     }
 
